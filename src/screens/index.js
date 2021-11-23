@@ -1,0 +1,9 @@
+export {default as Login} from './Login';
+export {default as Register} from './Register';
+export {default as Home} from './Home';
+export {default as Pradiagnosa} from './Pradiagnosa';
+export {default as Diagnosa} from './Diagnosa';
+export {default as Solusi} from './Solusi';
+export {default as Info} from './Info';
+export {default as Penyakit} from './Penyakit';
+export {default as Gejala} from './Gejala';
