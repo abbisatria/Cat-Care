@@ -8,31 +8,37 @@ import {
 } from 'react-native';
 import {IcCat, IcDiagnosa, IcHome} from '../../assets';
 import {useNavigation} from '@react-navigation/native';
+import {Button} from '../../components';
 
 const Home = () => {
   const navigation = useNavigation();
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>My Cat Care</Text>
-        <IcCat />
-        <Text style={styles.subTitle}>
-          Selamat Datang{'\n'}Diagnosa Penyakit Kulit Kucing
-        </Text>
-      </View>
-      <View style={styles.content}>
-        <TouchableOpacity style={styles.card} onPress={null}>
-          <IcHome />
-          <Text style={styles.textCard}>Pemeliharaan</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => navigation.navigate('Pradiagnosa')}>
-          <IcDiagnosa />
-          <Text style={styles.textCard}>Diagnosa Penyakit</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+    <View style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <Text style={styles.title}>My Cat Care</Text>
+          <IcCat />
+          <Text style={styles.subTitle}>
+            Selamat Datang{'\n'}Diagnosa Penyakit Kulit Kucing
+          </Text>
+        </View>
+        <View style={styles.content}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('Info')}>
+            <IcHome />
+            <Text style={styles.textCard}>Pemeliharaan</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('Pradiagnosa')}>
+            <IcDiagnosa />
+            <Text style={styles.textCard}>Diagnosa Penyakit</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+      <Button title="Keluar" onPress={() => navigation.navigate('Login')} />
+    </View>
   );
 };
 
@@ -59,6 +65,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 20,
     backgroundColor: '#ffffff',
@@ -67,7 +74,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 30,
+    marginVertical: 30,
   },
   card: {
     alignItems: 'center',

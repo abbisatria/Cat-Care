@@ -7,20 +7,33 @@ import {useNavigation} from '@react-navigation/native';
 const Pradiagnosa = () => {
   const navigation = useNavigation();
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>My Cat Care</Text>
-        <IcCat />
-        <Text style={styles.subTitle}>
-          Selamat Datang {'\n'} di Halaman Diagnosa Penyakit {'\n'} Anda hanya
-          perlu menjawab “Ya” atau {'\n'} “Tidak” disetiap pertanyaan yang
-          diajukan
-        </Text>
+    <View style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <Text style={styles.title}>My Cat Care</Text>
+          <IcCat />
+          <Text style={styles.subTitle}>
+            Selamat Datang {'\n'} di Halaman Diagnosa Penyakit {'\n'} Anda hanya
+            perlu menjawab “Ya” atau {'\n'} “Tidak” disetiap pertanyaan yang
+            diajukan
+          </Text>
+        </View>
+        <View style={styles.content}>
+          <Button
+            title="Mulai"
+            onPress={() => navigation.navigate('Diagnosa')}
+          />
+        </View>
+      </ScrollView>
+      <View style={styles.bottonButtom}>
+        <View style={styles.button}>
+          <Button title="Kembali" onPress={() => navigation.goBack()} />
+        </View>
+        <View style={styles.button}>
+          <Button title="Keluar" onPress={() => navigation.navigate('Login')} />
+        </View>
       </View>
-      <View style={styles.content}>
-        <Button title="Mulai" onPress={() => navigation.navigate('Diagnosa')} />
-      </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -47,11 +60,19 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 20,
     backgroundColor: '#ffffff',
   },
   content: {
-    marginTop: 30,
+    marginVertical: 30,
+  },
+  bottonButtom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  button: {
+    width: '40%',
   },
 });
