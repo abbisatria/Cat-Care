@@ -3,6 +3,7 @@ import {Text, View, StyleSheet, ScrollView, Linking} from 'react-native';
 import {IcCat} from '../../assets';
 import {Button} from '../../components';
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Info = () => {
   const navigation = useNavigation();
@@ -32,7 +33,13 @@ const Info = () => {
           <Button title="Kembali" onPress={() => navigation.goBack()} />
         </View>
         <View style={styles.button}>
-          <Button title="Keluar" onPress={() => navigation.navigate('Login')} />
+          <Button
+            title="Keluar"
+            onPress={async () => {
+              await AsyncStorage.removeItem('@token');
+              navigation.reset({index: 0, routes: [{name: 'Login'}]});
+            }}
+          />
         </View>
       </View>
     </View>

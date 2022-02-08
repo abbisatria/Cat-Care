@@ -3,9 +3,13 @@ import {Text, View, StyleSheet, ScrollView} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {IcCat} from '../../assets';
 import {Button} from '../../components';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Solusi = () => {
+const Solusi = ({route}) => {
   const navigation = useNavigation();
+
+  const {faktor, nama_penyakit, solusi} = route.params;
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -18,28 +22,40 @@ const Solusi = () => {
           <View style={styles.text}>
             <Text style={styles.desc}>Penyakit </Text>
             <Text>kucing anda adalah </Text>
-            <Text>SCABIES!!!</Text>
+            <Text>{nama_penyakit}</Text>
           </View>
           <View style={styles.text}>
             <Text style={styles.desc}>Faktor </Text>
-            <Text>terjadi SCABIES adalah </Text>
-            <Text>TUNGAU atau KUTU KULIT</Text>
+            <Text>terjadi {nama_penyakit} adalah </Text>
+            <Text>{faktor}</Text>
           </View>
           <View style={styles.text}>
             <Text style={styles.desc}>Solusi yang disarankan adalah </Text>
-            <Text>
-              Bersihkan keropeng atau kerak yang ada pada kulit kucing lalu
-              berikan obat scabimite
-            </Text>
+            <Text>{solusi}</Text>
           </View>
         </View>
+        <Button
+          title="Selesai"
+          onPress={() => navigation.reset({index: 0, routes: [{name: 'Home'}]})}
+        />
       </ScrollView>
       <View style={styles.bottonButtom}>
         <View style={styles.button}>
-          <Button title="Kembali" onPress={() => navigation.goBack()} />
+          <Button
+            title="Kembali"
+            onPress={() =>
+              navigation.reset({index: 0, routes: [{name: 'Home'}]})
+            }
+          />
         </View>
         <View style={styles.button}>
-          <Button title="Keluar" onPress={() => navigation.navigate('Login')} />
+          <Button
+            title="Keluar"
+            onPress={async () => {
+              await AsyncStorage.removeItem('@token');
+              navigation.reset({index: 0, routes: [{name: 'Login'}]});
+            }}
+          />
         </View>
       </View>
     </View>

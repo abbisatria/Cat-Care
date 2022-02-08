@@ -9,6 +9,7 @@ import {
 import {IcCat, IcDiagnosa, IcHome} from '../../assets';
 import {useNavigation} from '@react-navigation/native';
 import {Button} from '../../components';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = () => {
   const navigation = useNavigation();
@@ -37,7 +38,13 @@ const Home = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <Button title="Keluar" onPress={() => navigation.navigate('Login')} />
+      <Button
+        title="Keluar"
+        onPress={async () => {
+          await AsyncStorage.removeItem('@token');
+          navigation.reset({index: 0, routes: [{name: 'Login'}]});
+        }}
+      />
     </View>
   );
 };

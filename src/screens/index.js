@@ -7,3 +7,4 @@ export {default as Solusi} from './Solusi';
 export {default as Info} from './Info';
 export {default as Penyakit} from './Penyakit';
 export {default as Gejala} from './Gejala';
+export {default as Loading} from './Loading';

@@ -11,7 +11,7 @@ const Input = ({placeholder, type, password, onChange}) => {
         keyboardType={type}
         style={styles.textInput}
         secureTextEntry={password ? (isPasswordShown ? false : true) : false}
-        onChange={onChange}
+        onChangeText={onChange}
       />
       {password && (
         <TouchableOpacity onPress={() => setIsPasswordShown(!isPasswordShown)}>
