@@ -39,7 +39,6 @@ const Diagnosa = () => {
   }, []);
 
   const submit = async (choose, value) => {
-    // navigation.navigate('Solusi')
     if (step === data.length - 1) {
       if (choose === 'yes') {
         setDiagnosa([...diagnosa, value]);

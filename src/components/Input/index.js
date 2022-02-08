@@ -1,11 +1,16 @@
 import React, {useState} from 'react';
 import {StyleSheet, View, TextInput, TouchableOpacity} from 'react-native';
-import {IcEye, IcEyeSlash} from '../../assets';
+import {IcEye, IcEyeSlash, IcSearch} from '../../assets';
 
-const Input = ({placeholder, type, password, onChange}) => {
+const Input = ({placeholder, type, password, onChange, search}) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   return (
     <View style={styles.input}>
+      {search && (
+        <TouchableOpacity onPress={search} style={styles.search}>
+          <IcSearch />
+        </TouchableOpacity>
+      )}
       <TextInput
         placeholder={placeholder}
         keyboardType={type}
@@ -36,5 +41,8 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
+  },
+  search: {
+    marginRight: 12,
   },
 });

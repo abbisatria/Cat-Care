@@ -2,6 +2,7 @@ import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import React, {useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import jwt from 'jwt-decode';
 
 const Loading = () => {
   const navigation = useNavigation();
@@ -9,7 +10,12 @@ const Loading = () => {
   const fetchToken = async () => {
     const token = await AsyncStorage.getItem('@token');
     if (token !== null) {
-      navigation.replace('Home');
+      const user = jwt(token);
+      if (user.role === 1) {
+        navigation.replace('HomeAdmin');
+      } else {
+        navigation.replace('Home');
+      }
     } else {
       navigation.replace('Login');
     }

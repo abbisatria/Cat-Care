@@ -1,3 +1,9 @@
 export {default as Input} from './Input';
 export {default as Button} from './Button';
 export {default as Gap} from './Gap';
+export {default as Select} from './Select';
+export {default as ModalPenyakit} from './Modal/Penyakit';
+export {default as ModalGejala} from './Modal/Gejala';
+export {default as ModalFaktor} from './Modal/Faktor';
+export {default as ModalSolusi} from './Modal/Solusi';
+export {default as ModalRule} from './Modal/Rule';

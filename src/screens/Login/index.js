@@ -12,6 +12,7 @@ import {Button, Gap, Input} from '../../components';
 import http from '../../helpers/http';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {showMessage} from '../../helpers/showMessage';
+import jwt from 'jwt-decode';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -20,14 +21,27 @@ const Login = () => {
 
   const submit = async () => {
     try {
-      const payload = {
-        username,
-        password,
-      };
-      const result = await http().post('api/v1/users/login', payload);
-      await AsyncStorage.setItem('@token', result.data.results.token);
-      showMessage(result.data.message, 'success');
-      navigation.replace('Home');
+      if (!username || !password) {
+        if (!username) {
+          showMessage('Username harus diisi!!!');
+        } else {
+          showMessage('Password harus diisi!!!');
+        }
+      } else {
+        const payload = {
+          username,
+          password,
+        };
+        const result = await http().post('api/v1/users/login', payload);
+        await AsyncStorage.setItem('@token', result.data.results.token);
+        showMessage(result.data.message, 'success');
+        const user = jwt(result.data.results.token);
+        if (user.role === 1) {
+          navigation.replace('HomeAdmin');
+        } else {
+          navigation.replace('Home');
+        }
+      }
     } catch (err) {
       const {message} = err.response.data;
       showMessage(message);

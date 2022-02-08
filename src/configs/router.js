@@ -2,15 +2,19 @@ import React, {Component} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
   Diagnosa,
+  Faktor,
   Gejala,
   Home,
+  HomeAdmin,
   Info,
   Loading,
   Login,
   Penyakit,
   Pradiagnosa,
   Register,
+  Rule,
   Solusi,
+  SolusiAdmin,
 } from '../screens';
 
 const Stack = createNativeStackNavigator();
@@ -23,6 +27,7 @@ class router extends Component {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="HomeAdmin" component={HomeAdmin} />
         <Stack.Screen name="Pradiagnosa" component={Pradiagnosa} />
         <Stack.Screen name="Diagnosa" component={Diagnosa} />
         <Stack.Screen name="Info" component={Info} />
@@ -30,6 +35,9 @@ class router extends Component {
         {/* Admin */}
         <Stack.Screen name="Penyakit" component={Penyakit} />
         <Stack.Screen name="Gejala" component={Gejala} />
+        <Stack.Screen name="Faktor" component={Faktor} />
+        <Stack.Screen name="SolusiAdmin" component={SolusiAdmin} />
+        <Stack.Screen name="Rule" component={Rule} />
       </Stack.Navigator>
     );
   }
