@@ -1,8 +1,33 @@
-import React from 'react';
-import {Modal, StyleSheet, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {ActivityIndicator, Modal, StyleSheet, Text, View} from 'react-native';
 import {Button, Gap, Input} from '..';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import http from '../../helpers/http';
+import {showMessage} from '../../helpers/showMessage';
 
-const ModalGejala = ({isOpen, toggle}) => {
+const ModalGejala = ({isOpen, toggle, fetch}) => {
+  const [nama, setNama] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const submit = async () => {
+    try {
+      setLoading(true);
+      const payload = {
+        nama,
+      };
+      const token = await AsyncStorage.getItem('@token');
+      const result = await http(token).post('api/v1/gejala', payload);
+      await fetch();
+      setLoading(true);
+      toggle();
+      showMessage(result.data.message, 'success');
+    } catch (err) {
+      setLoading(false);
+      const {message} = err.response.data;
+      showMessage(message);
+    }
+  };
+
   return (
     <Modal
       animationType="fade"
@@ -14,9 +39,13 @@ const ModalGejala = ({isOpen, toggle}) => {
       <View style={styles.container}>
         <View style={styles.modalView}>
           <Text style={styles.modalText}>Nama Gejala</Text>
-          <Input placeholder="Nama Gejala" />
+          <Input placeholder="Nama Gejala" onChange={value => setNama(value)} />
           <Gap height={20} />
-          <Button title="Simpan" />
+          {loading ? (
+            <ActivityIndicator size="large" />
+          ) : (
+            <Button title="Simpan" onPress={() => submit()} />
+          )}
         </View>
       </View>
     </Modal>

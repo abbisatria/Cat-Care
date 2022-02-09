@@ -1,29 +1,110 @@
-import React, {useState} from 'react';
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {IcArrowBack, IcPlus, IcTrash} from '../../../assets';
-import {Gap, Input, ModalSolusi} from '../../../components';
+import {Gap, Input, ModalDelete, ModalSolusi} from '../../../components';
 import {useNavigation} from '@react-navigation/native';
+import http from '../../../helpers/http';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {showMessage} from '../../../helpers/showMessage';
 
 const SolusiAdmin = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [data, setData] = useState({
+    count: 1,
+    pageCount: 1,
+    data: [],
+  });
+  const [dataPenyakit, setDataPenyakit] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [deleteData, setDeleteData] = useState('');
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
   const toggle = () => setIsOpen(!isOpen);
+  const toggleDelete = () => setIsOpenDelete(!isOpenDelete);
   const navigation = useNavigation();
 
-  const data = [
-    {
-      id: 1,
-      nama: 'Berjemur, Oles salep jamur, Usahakan bulu kering sempurna pasca mandi, Beri shampoo yang mengandung anti jamur (bawa pada drh untuk penanganan lebih tepat)',
-    },
-    {
-      id: 2,
-      nama: 'Keropeng pada kulit perlu dibersihkan, Oles salep scabimite, Mandikan kucing dengan shampoo yg mengandung zat sulphur (bawa ke drh untuk mendapatkan pengobatan anti parasit)',
-    },
-    {
-      id: 3,
-      nama: 'Berikan makanan khusus allergy, antihistamin atau antiinflamasi',
-    },
-  ];
+  const fetchSolusi = async type => {
+    try {
+      setLoading(true);
+      const params = {
+        page: type ? 1 : page,
+        search,
+      };
+      const token = await AsyncStorage.getItem('@token');
+      const result = await http(token).get('api/v1/solusi', {params});
+      if (type) {
+        setPage(1);
+      }
+      setData(result.data.results);
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      const {message} = err.response.data;
+      showMessage(message);
+    }
+  };
+
+  const fetchPenyakit = async () => {
+    try {
+      const token = await AsyncStorage.getItem('@token');
+      const result = await http(token).get('api/v1/penyakit');
+      setDataPenyakit(result.data.results);
+    } catch (err) {
+      const {message} = err.response.data;
+      showMessage(message);
+    }
+  };
+
+  const next = async () => {
+    if (page !== data?.pageCount) {
+      const params = {
+        page: page + 1,
+        search,
+      };
+      const token = await AsyncStorage.getItem('@token');
+      const result = await http(token).get('api/v1/solusi', {params});
+      const finalResult = {
+        ...data,
+        data: [...data?.data, ...result.data.results.data],
+        count: result.data.results.count,
+        pageCount: result.data.results.pageCount,
+      };
+      setPage(page + 1);
+      setData(finalResult);
+    }
+  };
+
+  useEffect(() => {
+    fetchSolusi();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const deleteSolusi = async () => {
+    try {
+      setLoadingDelete(true);
+      const token = await AsyncStorage.getItem('@token');
+      const result = await http(token).delete(`api/v1/solusi/${deleteData}`);
+      showMessage(result.data.message, 'success');
+      toggleDelete();
+      fetchSolusi('refresh');
+      setLoadingDelete(false);
+    } catch (err) {
+      setLoadingDelete(false);
+      const {message} = err.response.data;
+      showMessage(message);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -31,26 +112,57 @@ const SolusiAdmin = () => {
           <IcArrowBack />
         </TouchableOpacity>
         <Text style={styles.title}>Daftar Solusi</Text>
-        <TouchableOpacity onPress={() => toggle()}>
+        <TouchableOpacity
+          onPress={async () => {
+            await fetchPenyakit();
+            toggle();
+          }}>
           <IcPlus />
         </TouchableOpacity>
       </View>
-      <Input placeholder="Cari Solusi" search={() => console.log('test')} />
-      <Gap height={25} />
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        data={data}
-        renderItem={({item}) => (
-          <View style={styles.card}>
-            <Text>{item.nama}</Text>
-            <TouchableOpacity>
-              <IcTrash />
-            </TouchableOpacity>
-          </View>
-        )}
-        keyExtractor={item => item.id}
+      <Input
+        placeholder="Cari Solusi"
+        search={() => fetchSolusi('search')}
+        onChange={value => setSearch(value)}
       />
-      <ModalSolusi isOpen={isOpen} toggle={() => toggle()} />
+      <Gap height={25} />
+      {loading ? (
+        <ActivityIndicator size="large" />
+      ) : (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={data?.data}
+          renderItem={({item}) => (
+            <View style={styles.card}>
+              <Text>{item.nama}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setDeleteData(item.id);
+                  toggleDelete();
+                }}>
+                <IcTrash />
+              </TouchableOpacity>
+            </View>
+          )}
+          keyExtractor={item => item.id}
+          refreshing={false}
+          onRefresh={() => fetchSolusi('refresh')}
+          onEndReached={next}
+          onEndReachedThreshold={0.5}
+        />
+      )}
+      <ModalSolusi
+        isOpen={isOpen}
+        toggle={() => toggle()}
+        data={dataPenyakit}
+        fetch={() => fetchSolusi('refresh')}
+      />
+      <ModalDelete
+        isOpen={isOpenDelete}
+        toggle={() => toggleDelete()}
+        loading={loadingDelete}
+        deleteData={() => deleteSolusi()}
+      />
     </View>
   );
 };

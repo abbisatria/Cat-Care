@@ -1,27 +1,36 @@
 import React, {useState} from 'react';
-import {Modal, StyleSheet, Text, View} from 'react-native';
-import {Button, Gap, Input, Select} from '..';
+import {ActivityIndicator, Modal, StyleSheet, Text, View} from 'react-native';
+import {Button, Gap, Select} from '..';
+import Select2 from 'react-native-select-two';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import http from '../../helpers/http';
+import {showMessage} from '../../helpers/showMessage';
 
-const ModalRule = ({isOpen, toggle}) => {
+const ModalRule = ({isOpen, toggle, dataGejala, dataPenyakit, fetch}) => {
   const [penyakit, setPenyakit] = useState('');
-  const data = [
-    {
-      id: 1,
-      nama: 'Dertamologi',
-    },
-    {
-      id: 2,
-      nama: 'Scabies',
-    },
-    {
-      id: 3,
-      nama: 'Feline Acne',
-    },
-    {
-      id: 4,
-      nama: 'Infestasi Kutu',
-    },
-  ];
+  const [rule, setRule] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const submit = async () => {
+    try {
+      setLoading(true);
+      const payload = {
+        id_penyakit: penyakit,
+        id_gejala: rule,
+      };
+      const token = await AsyncStorage.getItem('@token');
+      const result = await http(token).post('api/v1/rule', payload);
+      await fetch();
+      setLoading(true);
+      toggle();
+      showMessage(result.data.message, 'success');
+    } catch (err) {
+      setLoading(false);
+      const {message} = err.response.data;
+      showMessage(message);
+    }
+  };
+
   return (
     <Modal
       animationType="fade"
@@ -34,15 +43,35 @@ const ModalRule = ({isOpen, toggle}) => {
         <View style={styles.modalView}>
           <Text style={styles.modalText}>Nama Penyakit</Text>
           <Select
-            data={data}
+            data={dataPenyakit}
             onChange={value => setPenyakit(value)}
             value={penyakit}
+            label="Pilih Penyakit"
           />
           <Gap height={20} />
           <Text style={styles.modalText}>Rule</Text>
-          <Input placeholder="Rule" />
+          <Select2
+            colorTheme="blue"
+            popupTitle="Select Rule"
+            title="Select Rule"
+            style={styles.select}
+            data={dataGejala}
+            onSelect={data => {
+              setRule(data);
+            }}
+            onRemoveItem={data => {
+              setRule(data);
+            }}
+            cancelButtonText="Cancel"
+            selectButtonText="Select"
+            showSearchBox={false}
+          />
           <Gap height={20} />
-          <Button title="Simpan" />
+          {loading ? (
+            <ActivityIndicator size="large" />
+          ) : (
+            <Button title="Simpan" onPress={() => submit()} />
+          )}
         </View>
       </View>
     </Modal>
@@ -76,6 +105,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#021638',
   },
+  select: {borderRadius: 10, borderColor: '#BEBAB3'},
 });
 
 export default ModalRule;

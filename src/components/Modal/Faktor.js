@@ -1,27 +1,35 @@
 import React, {useState} from 'react';
-import {Modal, StyleSheet, Text, View} from 'react-native';
+import {ActivityIndicator, Modal, StyleSheet, Text, View} from 'react-native';
 import {Button, Gap, Input, Select} from '..';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import http from '../../helpers/http';
+import {showMessage} from '../../helpers/showMessage';
 
-const ModalFaktor = ({isOpen, toggle}) => {
+const ModalFaktor = ({isOpen, toggle, data, fetch}) => {
+  const [nama, setNama] = useState('');
   const [penyakit, setPenyakit] = useState('');
-  const data = [
-    {
-      id: 1,
-      nama: 'Dertamologi',
-    },
-    {
-      id: 2,
-      nama: 'Scabies',
-    },
-    {
-      id: 3,
-      nama: 'Feline Acne',
-    },
-    {
-      id: 4,
-      nama: 'Infestasi Kutu',
-    },
-  ];
+  const [loading, setLoading] = useState(false);
+
+  const submit = async () => {
+    try {
+      setLoading(true);
+      const payload = {
+        nama,
+        id_penyakit: penyakit,
+      };
+      const token = await AsyncStorage.getItem('@token');
+      const result = await http(token).post('api/v1/faktor', payload);
+      await fetch();
+      setLoading(true);
+      toggle();
+      showMessage(result.data.message, 'success');
+    } catch (err) {
+      setLoading(false);
+      const {message} = err.response.data;
+      showMessage(message);
+    }
+  };
+
   return (
     <Modal
       animationType="fade"
@@ -37,12 +45,17 @@ const ModalFaktor = ({isOpen, toggle}) => {
             data={data}
             onChange={value => setPenyakit(value)}
             value={penyakit}
+            label="Pilih Penyakit"
           />
           <Gap height={20} />
           <Text style={styles.modalText}>Nama Faktor</Text>
-          <Input placeholder="Nama Faktor" />
+          <Input placeholder="Nama Faktor" onChange={value => setNama(value)} />
           <Gap height={20} />
-          <Button title="Simpan" />
+          {loading ? (
+            <ActivityIndicator size="large" />
+          ) : (
+            <Button title="Simpan" onPress={() => submit()} />
+          )}
         </View>
       </View>
     </Modal>

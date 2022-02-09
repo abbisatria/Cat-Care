@@ -21,9 +21,12 @@
     "react-native-dotenv": "^3.3.1",
     "react-native-flash-message": "^0.2.0",
     "react-native-gesture-handler": "^1.10.3",
+    "react-native-modal": "^13.0.0",
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.9.0",
-    "react-native-svg": "^12.1.1"
+    "react-native-select-two": "^1.1.0",
+    "react-native-svg": "^12.1.1",
+    "react-native-vector-icons": "^9.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

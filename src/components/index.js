@@ -7,3 +7,4 @@ export {default as ModalGejala} from './Modal/Gejala';
 export {default as ModalFaktor} from './Modal/Faktor';
 export {default as ModalSolusi} from './Modal/Solusi';
 export {default as ModalRule} from './Modal/Rule';
+export {default as ModalDelete} from './Modal/Delete';
