@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {IcWelcome} from '../../assets';
@@ -16,6 +17,7 @@ const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
   const submit = async () => {
@@ -29,6 +31,7 @@ const Register = () => {
           showMessage('Email harus diisi!!!');
         }
       } else {
+        setLoading(true);
         const payload = {
           username,
           password,
@@ -36,9 +39,11 @@ const Register = () => {
         };
         const result = await http().post('api/v1/users/register', payload);
         showMessage(result.data.message, 'success');
+        setLoading(false);
         navigation.navigate('Login');
       }
     } catch (err) {
+      setLoading(false);
       const {message} = err.response.data;
       showMessage(message);
     }
@@ -64,7 +69,11 @@ const Register = () => {
         onChange={value => setEmail(value)}
       />
       <Gap height={16} />
-      <Button title="Register" onPress={() => submit()} />
+      {loading ? (
+        <ActivityIndicator size="large" />
+      ) : (
+        <Button title="Register" onPress={() => submit()} />
+      )}
       <Gap height={27} />
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
         <Text style={styles.register}>Login</Text>

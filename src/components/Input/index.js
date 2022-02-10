@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {StyleSheet, View, TextInput, TouchableOpacity} from 'react-native';
 import {IcEye, IcEyeSlash, IcSearch} from '../../assets';
 
-const Input = ({placeholder, type, password, onChange, search}) => {
+const Input = ({placeholder, type, password, onChange, search, value}) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   return (
     <View style={styles.input}>
@@ -17,6 +17,7 @@ const Input = ({placeholder, type, password, onChange, search}) => {
         style={styles.textInput}
         secureTextEntry={password ? (isPasswordShown ? false : true) : false}
         onChangeText={onChange}
+        defaultValue={value}
       />
       {password && (
         <TouchableOpacity onPress={() => setIsPasswordShown(!isPasswordShown)}>

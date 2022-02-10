@@ -79,7 +79,7 @@ const Diagnosa = () => {
               {data[step].image && (
                 <Image
                   source={{
-                    uri: 'https://www.hewanpeliharaan.org/wp-content/uploads/2016/04/kucing-terkena-kutu.jpg',
+                    uri: `http://103.55.36.203:5000/images/${data[step].image}`,
                   }}
                   style={styles.image}
                 />

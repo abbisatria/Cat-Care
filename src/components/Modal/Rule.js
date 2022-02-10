@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, Modal, StyleSheet, Text, View} from 'react-native';
 import {Button, Gap, Select} from '..';
 import Select2 from 'react-native-select-two';
@@ -6,10 +6,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import http from '../../helpers/http';
 import {showMessage} from '../../helpers/showMessage';
 
-const ModalRule = ({isOpen, toggle, dataGejala, dataPenyakit, fetch}) => {
+const ModalRule = ({
+  isOpen,
+  toggle,
+  dataGejala,
+  dataPenyakit,
+  fetch,
+  dataEdit,
+}) => {
   const [penyakit, setPenyakit] = useState('');
   const [rule, setRule] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (dataEdit) {
+      const editRule = dataEdit.rules.map(val => val.id_gejala);
+      setRule(editRule);
+      setPenyakit(dataEdit.id);
+    } else {
+      setRule([]);
+      setPenyakit('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const submit = async () => {
     try {
@@ -19,9 +38,14 @@ const ModalRule = ({isOpen, toggle, dataGejala, dataPenyakit, fetch}) => {
         id_gejala: rule,
       };
       const token = await AsyncStorage.getItem('@token');
-      const result = await http(token).post('api/v1/rule', payload);
+      let result;
+      if (dataEdit) {
+        result = await http(token).put('api/v1/rule', payload);
+      } else {
+        result = await http(token).post('api/v1/rule', payload);
+      }
       await fetch();
-      setLoading(true);
+      setLoading(false);
       toggle();
       showMessage(result.data.message, 'success');
     } catch (err) {

@@ -1,13 +1,22 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, Modal, StyleSheet, Text, View} from 'react-native';
 import {Button, Gap, Input} from '..';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import http from '../../helpers/http';
 import {showMessage} from '../../helpers/showMessage';
 
-const ModalPenyakit = ({isOpen, toggle, fetch}) => {
+const ModalPenyakit = ({isOpen, toggle, fetch, dataEdit}) => {
   const [nama, setNama] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (dataEdit) {
+      setNama(dataEdit.nama);
+    } else {
+      setNama('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const submit = async () => {
     try {
@@ -16,9 +25,17 @@ const ModalPenyakit = ({isOpen, toggle, fetch}) => {
         nama,
       };
       const token = await AsyncStorage.getItem('@token');
-      const result = await http(token).post('api/v1/penyakit', payload);
+      let result;
+      if (dataEdit) {
+        result = await http(token).put(
+          `api/v1/penyakit/${dataEdit.id}`,
+          payload,
+        );
+      } else {
+        result = await http(token).post('api/v1/penyakit', payload);
+      }
       await fetch();
-      setLoading(true);
+      setLoading(false);
       toggle();
       showMessage(result.data.message, 'success');
     } catch (err) {
@@ -42,6 +59,7 @@ const ModalPenyakit = ({isOpen, toggle, fetch}) => {
           <Input
             placeholder="Nama Penyakit"
             onChange={value => setNama(value)}
+            value={nama}
           />
           <Gap height={20} />
           {loading ? (

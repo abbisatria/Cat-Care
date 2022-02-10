@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {IcArrowBack, IcPlus, IcTrash} from '../../../assets';
+import {IcArrowBack, IcEdit, IcPlus, IcTrash} from '../../../assets';
 import {Gap, Input, ModalDelete, ModalRule} from '../../../components';
 import {useNavigation} from '@react-navigation/native';
 import http from '../../../helpers/http';
@@ -24,6 +24,7 @@ const Rule = () => {
     pageCount: 1,
     data: [],
   });
+  const [dataEdit, setDataEdit] = useState('');
   const [dataGejala, setDataGejala] = useState([]);
   const [dataPenyakit, setDataPenyakit] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -55,16 +56,27 @@ const Rule = () => {
     }
   };
 
-  const fetchGejala = async () => {
+  const fetchGejala = async rule => {
     try {
       const token = await AsyncStorage.getItem('@token');
       const result = await http(token).get('api/v1/gejala');
       const finalResult = result.data.results.map(val => {
+        if (rule) {
+          if (rule.rules.filter(item => item.id_gejala === val.id).length > 0) {
+            return {
+              id: val.id,
+              name: val.nama,
+              checked: true,
+            };
+          }
+        }
         return {
           id: val.id,
           name: val.nama,
         };
       });
+      console.log('result', finalResult);
+      console.log('rule', rule);
       setDataGejala(finalResult);
     } catch (err) {
       const {message} = err.response.data;
@@ -134,6 +146,7 @@ const Rule = () => {
           onPress={async () => {
             await fetchGejala();
             await fetchPenyakit();
+            setDataEdit();
             toggle();
           }}>
           <IcPlus />
@@ -153,14 +166,26 @@ const Rule = () => {
           data={data?.data}
           renderItem={({item}) => (
             <View style={styles.card}>
-              <Text>{item.nama}</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setDeleteData(item.id);
-                  toggleDelete();
-                }}>
-                <IcTrash />
-              </TouchableOpacity>
+              <Text style={styles.text}>{item.nama}</Text>
+              <View style={styles.button}>
+                <TouchableOpacity
+                  onPress={async () => {
+                    await fetchGejala(item);
+                    await fetchPenyakit();
+                    setDataEdit(item);
+                    toggle();
+                  }}>
+                  <IcEdit />
+                </TouchableOpacity>
+                <Gap width={5} />
+                <TouchableOpacity
+                  onPress={() => {
+                    setDeleteData(item.id);
+                    toggleDelete();
+                  }}>
+                  <IcTrash />
+                </TouchableOpacity>
+              </View>
             </View>
           )}
           keyExtractor={item => item.id}
@@ -176,6 +201,7 @@ const Rule = () => {
         dataGejala={dataGejala}
         dataPenyakit={dataPenyakit}
         fetch={() => fetchRule('refresh')}
+        dataEdit={dataEdit}
       />
       <ModalDelete
         isOpen={isOpenDelete}
@@ -215,5 +241,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     padding: 10,
     borderRadius: 10,
+  },
+  text: {
+    width: '75%',
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

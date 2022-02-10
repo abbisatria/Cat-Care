@@ -13,3 +13,4 @@ export {default as IcArrowBack} from './icon/ic-arrow-back.svg';
 export {default as IcPlus} from './icon/ic-plus.svg';
 export {default as IcSearch} from './icon/ic-search.svg';
 export {default as IcTrash} from './icon/ic-trash.svg';
+export {default as IcEdit} from './icon/ic-edit.svg';

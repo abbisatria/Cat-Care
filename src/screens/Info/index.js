@@ -21,7 +21,11 @@ const Info = () => {
         <View style={styles.content}>
           <Text
             style={styles.desc}
-            onPress={() => Linking.openURL('https://google.com')}>
+            onPress={() =>
+              Linking.openURL(
+                'https://www.kompas.com/homey/read/2021/05/29/194700076/mengenal-penyakit-scabies-pada-kucing-dan-cara-mengobatinya?page=all',
+              )
+            }>
             Cara pencegahan penyakit Scabies mengetahui umur kucing anda makanan
             yang tepat untuk perkembangan jenis-jenis kucing ras
             Selengkapnya....

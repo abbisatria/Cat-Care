@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {IcArrowBack, IcPlus, IcTrash} from '../../../assets';
+import {IcArrowBack, IcEdit, IcPlus, IcTrash} from '../../../assets';
 import {Gap, Input, ModalDelete, ModalSolusi} from '../../../components';
 import {useNavigation} from '@react-navigation/native';
 import http from '../../../helpers/http';
@@ -24,6 +24,7 @@ const SolusiAdmin = () => {
     pageCount: 1,
     data: [],
   });
+  const [dataEdit, setDataEdit] = useState('');
   const [dataPenyakit, setDataPenyakit] = useState([]);
   const [loading, setLoading] = useState(false);
   const [deleteData, setDeleteData] = useState('');
@@ -115,6 +116,7 @@ const SolusiAdmin = () => {
         <TouchableOpacity
           onPress={async () => {
             await fetchPenyakit();
+            setDataEdit('');
             toggle();
           }}>
           <IcPlus />
@@ -134,14 +136,25 @@ const SolusiAdmin = () => {
           data={data?.data}
           renderItem={({item}) => (
             <View style={styles.card}>
-              <Text>{item.nama}</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setDeleteData(item.id);
-                  toggleDelete();
-                }}>
-                <IcTrash />
-              </TouchableOpacity>
+              <Text style={styles.text}>{item.nama}</Text>
+              <View style={styles.button}>
+                <TouchableOpacity
+                  onPress={async () => {
+                    await fetchPenyakit();
+                    setDataEdit(item);
+                    toggle();
+                  }}>
+                  <IcEdit />
+                </TouchableOpacity>
+                <Gap width={5} />
+                <TouchableOpacity
+                  onPress={() => {
+                    setDeleteData(item.id);
+                    toggleDelete();
+                  }}>
+                  <IcTrash />
+                </TouchableOpacity>
+              </View>
             </View>
           )}
           keyExtractor={item => item.id}
@@ -156,6 +169,7 @@ const SolusiAdmin = () => {
         toggle={() => toggle()}
         data={dataPenyakit}
         fetch={() => fetchSolusi('refresh')}
+        dataEdit={dataEdit}
       />
       <ModalDelete
         isOpen={isOpenDelete}
@@ -195,5 +209,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     padding: 10,
     borderRadius: 10,
+  },
+  text: {
+    width: '75%',
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {IcArrowBack, IcPlus, IcTrash} from '../../../assets';
+import {IcArrowBack, IcEdit, IcPlus, IcTrash} from '../../../assets';
 import {Gap, Input, ModalDelete, ModalPenyakit} from '../../../components';
 import {useNavigation} from '@react-navigation/native';
 import {showMessage} from '../../../helpers/showMessage';
@@ -24,6 +24,7 @@ const Penyakit = () => {
     pageCount: 1,
     data: [],
   });
+  const [dataEdit, setDataEdit] = useState('');
   const [loading, setLoading] = useState(false);
   const [deleteData, setDeleteData] = useState('');
   const [loadingDelete, setLoadingDelete] = useState(false);
@@ -100,7 +101,11 @@ const Penyakit = () => {
           <IcArrowBack />
         </TouchableOpacity>
         <Text style={styles.title}>Daftar Penyakit</Text>
-        <TouchableOpacity onPress={() => toggle()}>
+        <TouchableOpacity
+          onPress={() => {
+            setDataEdit('');
+            toggle();
+          }}>
           <IcPlus />
         </TouchableOpacity>
       </View>
@@ -118,14 +123,24 @@ const Penyakit = () => {
           data={data?.data}
           renderItem={({item}) => (
             <View style={styles.card}>
-              <Text>{item.nama}</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setDeleteData(item.id);
-                  toggleDelete();
-                }}>
-                <IcTrash />
-              </TouchableOpacity>
+              <Text style={styles.text}>{item.nama}</Text>
+              <View style={styles.button}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setDataEdit(item);
+                    toggle();
+                  }}>
+                  <IcEdit />
+                </TouchableOpacity>
+                <Gap width={5} />
+                <TouchableOpacity
+                  onPress={() => {
+                    setDeleteData(item.id);
+                    toggleDelete();
+                  }}>
+                  <IcTrash />
+                </TouchableOpacity>
+              </View>
             </View>
           )}
           keyExtractor={item => item.id}
@@ -139,6 +154,7 @@ const Penyakit = () => {
         isOpen={isOpen}
         toggle={() => toggle()}
         fetch={() => fetchPenyakit('refresh')}
+        dataEdit={dataEdit}
       />
       <ModalDelete
         isOpen={isOpenDelete}
@@ -178,5 +194,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     padding: 10,
     borderRadius: 10,
+  },
+  text: {
+    width: '75%',
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

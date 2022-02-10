@@ -5,6 +5,7 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {IcWelcome} from '../../assets';
@@ -17,6 +18,7 @@ import jwt from 'jwt-decode';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
   const submit = async () => {
@@ -28,6 +30,7 @@ const Login = () => {
           showMessage('Password harus diisi!!!');
         }
       } else {
+        setLoading(true);
         const payload = {
           username,
           password,
@@ -36,6 +39,7 @@ const Login = () => {
         await AsyncStorage.setItem('@token', result.data.results.token);
         showMessage(result.data.message, 'success');
         const user = jwt(result.data.results.token);
+        setLoading(false);
         if (user.role === 1) {
           navigation.replace('HomeAdmin');
         } else {
@@ -43,6 +47,7 @@ const Login = () => {
         }
       }
     } catch (err) {
+      setLoading(false);
       const {message} = err.response.data;
       showMessage(message);
     }
@@ -63,7 +68,11 @@ const Login = () => {
         onChange={value => setPassword(value)}
       />
       <Gap height={16} />
-      <Button title="Login" onPress={() => submit()} />
+      {loading ? (
+        <ActivityIndicator size="large" />
+      ) : (
+        <Button title="Login" onPress={() => submit()} />
+      )}
       <Gap height={27} />
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={styles.register}>Register</Text>
